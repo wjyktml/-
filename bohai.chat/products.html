@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品购买 - NextsPay</title>
+    <meta name="description" content="NextsPay商品购买页面，安全便捷的在线支付体验">
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/element.css">
+    <link rel="stylesheet" href="css/fonts.css">
+    <link rel="stylesheet" href="css/style-5.css">
+    
+    <style>
+        .product-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .product-image {
+            height: 250px;
+            object-fit: cover;
+            width: 100%;
+        }
+        .product-price {
+            font-size: 24px;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        .product-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .product-description {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .category-filter {
+            margin-bottom: 30px;
+        }
+        .category-btn {
+            margin: 5px;
+            border-radius: 25px;
+        }
+        .search-box {
+            margin-bottom: 30px;
+        }
+        .cart-icon {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+        .cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #f39c12;
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- 导航栏 -->
+        <header class="rd-navbar-wrap">
+            <nav class="rd-navbar rd-navbar-classic" data-layout="rd-navbar-fixed">
+                <div class="rd-navbar-main-outer">
+                    <div class="rd-navbar-main">
+                        <div class="rd-navbar-panel">
+                            <button class="rd-navbar-toggle" data-rd-navbar-toggle=".rd-navbar-nav-wrap"><span></span></button>
+                            <div class="rd-navbar-brand">
+                                <a class="brand" href="index.html">
+                                    <img class="brand-logo-dark" src="images/logo-default-1-324x88.png" alt="NextsPay" width="162" height="44"/>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="rd-navbar-nav-wrap">
+                            <ul class="rd-navbar-nav">
+                                <li class="rd-nav-item">
+                                    <a class="rd-nav-link" href="index.html">首页</a>
+                                </li>
+                                <li class="rd-nav-item active">
+                                    <a class="rd-nav-link" href="products.html">商品购买</a>
+                                </li>
+                                <li class="rd-nav-item">
+                                    <a class="rd-nav-link" href="index.html#contacts">联系我们</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <!-- 主要内容 -->
+        <main class="section section-lg">
+            <div class="container">
+                <!-- 页面标题 -->
+                <div class="row justify-content-center mb-5">
+                    <div class="col-lg-8 text-center">
+                        <h1>商品购买</h1>
+                        <p class="lead">选择您需要的商品，享受安全便捷的支付体验</p>
+                    </div>
+                </div>
+
+                <!-- 搜索和筛选 -->
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="search-box">
+                            <el-input
+                                v-model="searchKeyword"
+                                placeholder="搜索商品..."
+                                prefix-icon="el-icon-search"
+                                @input="filterProducts"
+                                clearable>
+                            </el-input>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <el-select v-model="selectedCategory" placeholder="选择分类" @change="filterProducts" clearable>
+                            <el-option
+                                v-for="category in categories"
+                                :key="category.id"
+                                :label="category.name"
+                                :value="category.id">
+                            </el-option>
+                        </el-select>
+                    </div>
+                </div>
+
+                <!-- 商品列表 -->
+                <div class="row" v-if="filteredProducts.length > 0">
+                    <div class="col-lg-4 col-md-6 mb-4" v-for="product in filteredProducts" :key="product.id">
+                        <div class="card product-card h-100">
+                            <img :src="product.image" class="card-img-top product-image" :alt="product.name">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title product-title">{{ product.name }}</h5>
+                                <p class="card-text product-description flex-grow-1">{{ product.description }}</p>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <div class="product-price">¥{{ product.price }}</div>
+                                    <el-button type="primary" @click="addToCart(product)" :disabled="product.stock <= 0">
+                                        <i class="fa fa-shopping-cart"></i>
+                                        {{ product.stock > 0 ? '加入购物车' : '缺货' }}
+                                    </el-button>
+                                </div>
+                                <div class="mt-2">
+                                    <small class="text-muted">库存: {{ product.stock }} 件</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 无商品提示 -->
+                <div class="row" v-else>
+                    <div class="col-12 text-center">
+                        <div class="alert alert-info">
+                            <i class="fa fa-info-circle"></i>
+                            没有找到相关商品，请尝试其他搜索条件
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 购物车图标 -->
+        <div class="cart-icon" @click="showCart = true">
+            <i class="fa fa-shopping-cart fa-lg"></i>
+            <div class="cart-badge" v-if="cartItems.length > 0">{{ cartTotalQuantity }}</div>
+        </div>
+
+        <!-- 购物车弹窗 -->
+        <el-dialog title="购物车" :visible.sync="showCart" width="600px">
+            <div v-if="cartItems.length > 0">
+                <div class="cart-item" v-for="item in cartItems" :key="item.id" style="border-bottom: 1px solid #eee; padding: 15px 0;">
+                    <div class="row align-items-center">
+                        <div class="col-md-3">
+                            <img :src="item.image" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+                        </div>
+                        <div class="col-md-4">
+                            <h6>{{ item.name }}</h6>
+                            <p class="text-muted mb-0">¥{{ item.price }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <el-input-number v-model="item.quantity" :min="1" :max="item.stock" size="small"></el-input-number>
+                        </div>
+                        <div class="col-md-2 text-right">
+                            <div class="font-weight-bold">¥{{ (item.price * item.quantity).toFixed(2) }}</div>
+                            <el-button type="text" @click="removeFromCart(item.id)" style="color: #e74c3c;">
+                                <i class="fa fa-trash"></i>
+                            </el-button>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 text-right">
+                    <h5>总计: ¥{{ cartTotalPrice.toFixed(2) }}</h5>
+                </div>
+            </div>
+            <div v-else class="text-center py-4">
+                <i class="fa fa-shopping-cart fa-3x text-muted mb-3"></i>
+                <p class="text-muted">购物车是空的</p>
+            </div>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="showCart = false">继续购物</el-button>
+                <el-button type="primary" @click="goToCheckout" :disabled="cartItems.length === 0">
+                    去结算
+                </el-button>
+            </div>
+        </el-dialog>
+    </div>
+
+    <!-- JavaScript Files -->
+    <script src="js/jquery.js"></script>
+    <script src="js/vue.js"></script>
+    <script src="js/element.js"></script>
+    <script src="js/axios.min.js"></script>
+    <script src="js/util.js"></script>
+    <script src="js/api.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    products: [],
+                    categories: [],
+                    filteredProducts: [],
+                    searchKeyword: '',
+                    selectedCategory: '',
+                    cartItems: [],
+                    showCart: false
+                }
+            },
+            computed: {
+                cartTotalQuantity() {
+                    return this.cartItems.reduce((total, item) => total + item.quantity, 0);
+                },
+                cartTotalPrice() {
+                    return this.cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+                }
+            },
+            mounted() {
+                this.loadProducts();
+                this.loadCategories();
+                this.loadCart();
+            },
+            methods: {
+                async loadProducts() {
+                    try {
+                        // 模拟商品数据，实际应该从API获取
+                        this.products = [
+                            {
+                                id: 1,
+                                name: 'iPhone 15 Pro',
+                                description: '最新款iPhone，配备A17 Pro芯片，钛金属设计',
+                                price: 7999.00,
+                                image: 'images/products/iphone15.jpg',
+                                category_id: 1,
+                                stock: 10
+                            },
+                            {
+                                id: 2,
+                                name: 'MacBook Pro 14"',
+                                description: 'M3 Pro芯片，14英寸Liquid Retina XDR显示屏',
+                                price: 15999.00,
+                                image: 'images/products/macbook.jpg',
+                                category_id: 1,
+                                stock: 5
+                            },
+                            {
+                                id: 3,
+                                name: 'AirPods Pro',
+                                description: '主动降噪，空间音频，无线充电盒',
+                                price: 1899.00,
+                                image: 'images/products/airpods.jpg',
+                                category_id: 2,
+                                stock: 20
+                            },
+                            {
+                                id: 4,
+                                name: 'Apple Watch Series 9',
+                                description: 'S9芯片，Always-On显示屏，健康监测',
+                                price: 2999.00,
+                                image: 'images/products/watch.jpg',
+                                category_id: 2,
+                                stock: 15
+                            }
+                        ];
+                        this.filteredProducts = this.products;
+                    } catch (error) {
+                        this.$message.error('加载商品失败');
+                    }
+                },
+                async loadCategories() {
+                    try {
+                        this.categories = [
+                            { id: 1, name: '手机电脑' },
+                            { id: 2, name: '配件周边' },
+                            { id: 3, name: '数码产品' }
+                        ];
+                    } catch (error) {
+                        this.$message.error('加载分类失败');
+                    }
+                },
+                filterProducts() {
+                    let filtered = this.products;
+                    
+                    // 按关键词搜索
+                    if (this.searchKeyword) {
+                        filtered = filtered.filter(product => 
+                            product.name.toLowerCase().includes(this.searchKeyword.toLowerCase()) ||
+                            product.description.toLowerCase().includes(this.searchKeyword.toLowerCase())
+                        );
+                    }
+                    
+                    // 按分类筛选
+                    if (this.selectedCategory) {
+                        filtered = filtered.filter(product => product.category_id === this.selectedCategory);
+                    }
+                    
+                    this.filteredProducts = filtered;
+                },
+                addToCart(product) {
+                    const existingItem = this.cartItems.find(item => item.id === product.id);
+                    
+                    if (existingItem) {
+                        if (existingItem.quantity < product.stock) {
+                            existingItem.quantity++;
+                        } else {
+                            this.$message.warning('库存不足');
+                            return;
+                        }
+                    } else {
+                        this.cartItems.push({
+                            ...product,
+                            quantity: 1
+                        });
+                    }
+                    
+                    this.saveCart();
+                    this.$message.success('已添加到购物车');
+                },
+                removeFromCart(productId) {
+                    this.cartItems = this.cartItems.filter(item => item.id !== productId);
+                    this.saveCart();
+                },
+                saveCart() {
+                    localStorage.setItem('cart', JSON.stringify(this.cartItems));
+                },
+                loadCart() {
+                    const saved = localStorage.getItem('cart');
+                    if (saved) {
+                        this.cartItems = JSON.parse(saved);
+                    }
+                },
+                goToCheckout() {
+                    if (this.cartItems.length === 0) {
+                        this.$message.warning('购物车是空的');
+                        return;
+                    }
+                    
+                    // 跳转到收银台页面
+                    const cartData = encodeURIComponent(JSON.stringify(this.cartItems));
+                    window.location.href = `checkout.html?cart=${cartData}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

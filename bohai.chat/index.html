@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NextsPay - 专业的支付解决方案</title>
+    <meta name="description" content="NextsPay提供安全、便捷的支付解决方案，支持多种支付方式，为您的业务提供专业的支付服务。">
+    <meta name="keywords" content="支付,NextsPay,支付解决方案,在线支付,移动支付">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/element.css">
+    <link rel="stylesheet" href="css/fonts.css">
+    <link rel="stylesheet" href="css/style-5.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="appPage" v-show="showPage">
+        <!-- 导航栏 -->
+        <header class="rd-navbar-wrap">
+            <nav class="rd-navbar rd-navbar-classic" data-layout="rd-navbar-fixed" data-sm-layout="rd-navbar-fixed" data-md-layout="rd-navbar-fixed" data-lg-layout="rd-navbar-fixed" data-xl-layout="rd-navbar-fixed" data-xxl-layout="rd-navbar-fixed" data-lg-stick-up-offset="46px" data-xl-stick-up-offset="46px" data-xxl-stick-up-offset="46px" data-lg-stick-up="true" data-xl-stick-up="true" data-xxl-stick-up="true">
+                <div class="rd-navbar-main-outer">
+                    <div class="rd-navbar-main">
+                        <div class="rd-navbar-panel">
+                            <button class="rd-navbar-toggle" data-rd-navbar-toggle=".rd-navbar-nav-wrap"><span></span></button>
+                            <div class="rd-navbar-brand">
+                                <a class="brand" href="#home">
+                                    <img class="brand-logo-dark" src="images/logo-default-1-324x88.png" alt="NextsPay" width="162" height="44"/>
+                                    <img class="brand-logo-light" src="images/logo-default-2-324x88.png" alt="NextsPay" width="162" height="44"/>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="rd-navbar-nav-wrap">
+                            <ul class="rd-navbar-nav">
+                                <li class="rd-nav-item" :class="{active: activeSection === 'home'}">
+                                    <a class="rd-nav-link" href="#home" @click="scrollToSection('home')">首页</a>
+                                </li>
+                                <li class="rd-nav-item" :class="{active: activeSection === 'advantage'}">
+                                    <a class="rd-nav-link" href="#advantage" @click="scrollToSection('advantage')">优势</a>
+                                </li>
+                                <li class="rd-nav-item" :class="{active: activeSection === 'sdk'}">
+                                    <a class="rd-nav-link" href="#sdk" @click="scrollToSection('sdk')">SDK</a>
+                                </li>
+                                <li class="rd-nav-item" :class="{active: activeSection === 'roadmap'}">
+                                    <a class="rd-nav-link" href="#roadmap" @click="scrollToSection('roadmap')">路线图</a>
+                                </li>
+                                <li class="rd-nav-item" :class="{active: activeSection === 'contacts'}">
+                                    <a class="rd-nav-link" href="#contacts" @click="scrollToSection('contacts')">联系我们</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <!-- 主要内容区域 -->
+        <main>
+            <!-- 首页区域 -->
+            <section id="home" class="section section-lg bg-image-1">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-10">
+                            <div class="text-center">
+                                <h1 class="text-white">专业的支付解决方案</h1>
+                                <p class="text-white-50 lead">NextsPay为您提供安全、便捷、高效的支付服务，支持多种支付方式，助力您的业务发展</p>
+                                <div class="mt-4">
+                                    <a class="btn btn-primary btn-lg" href="#contacts" @click="scrollToSection('contacts')">立即咨询</a>
+                                    <a class="btn btn-outline-light btn-lg ml-3" href="#advantage" @click="scrollToSection('advantage')">了解更多</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 优势区域 -->
+            <section id="advantage" class="section section-lg">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8 text-center">
+                            <h2>为什么选择NextsPay</h2>
+                            <p class="lead">我们致力于为您的业务提供最优质的支付解决方案</p>
+                        </div>
+                    </div>
+                    <div class="row mt-5">
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <div class="icon icon-lg icon-primary">
+                                    <i class="fa fa-shield"></i>
+                                </div>
+                                <h4>安全保障</h4>
+                                <p>采用银行级安全标准，多重加密保护，确保您的资金安全</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <div class="icon icon-lg icon-primary">
+                                    <i class="fa fa-bolt"></i>
+                                </div>
+                                <h4>极速到账</h4>
+                                <p>实时处理，秒级到账，提升用户体验，加速资金流转</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <div class="icon icon-lg icon-primary">
+                                    <i class="fa fa-mobile"></i>
+                                </div>
+                                <h4>多端支持</h4>
+                                <p>支持PC、手机、平板等多种设备，随时随地轻松支付</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SDK区域 -->
+            <section id="sdk" class="section section-lg bg-light">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8 text-center">
+                            <h2>开发者友好的SDK</h2>
+                            <p class="lead">简单易用的API接口，快速集成到您的应用中</p>
+                        </div>
+                    </div>
+                    <div class="row mt-5">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">多种支付方式</h5>
+                                    <div class="row">
+                                        <div class="col-6 text-center">
+                                            <img src="images/pay/icon_pay_weixin.png" alt="微信支付" class="img-fluid mb-2">
+                                            <p>微信支付</p>
+                                        </div>
+                                        <div class="col-6 text-center">
+                                            <img src="images/pay/icon_pay_zhifubao.png" alt="支付宝" class="img-fluid mb-2">
+                                            <p>支付宝</p>
+                                        </div>
+                                        <div class="col-6 text-center">
+                                            <img src="images/pay/unionpay.png" alt="银联" class="img-fluid mb-2">
+                                            <p>银联</p>
+                                        </div>
+                                        <div class="col-6 text-center">
+                                            <img src="images/pay/apple-pay.png" alt="Apple Pay" class="img-fluid mb-2">
+                                            <p>Apple Pay</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">技术特性</h5>
+                                    <ul class="list-unstyled">
+                                        <li><i class="fa fa-check text-success"></i> RESTful API设计</li>
+                                        <li><i class="fa fa-check text-success"></i> 支持多种编程语言</li>
+                                        <li><i class="fa fa-check text-success"></i> 详细的开发文档</li>
+                                        <li><i class="fa fa-check text-success"></i> 7x24小时技术支持</li>
+                                        <li><i class="fa fa-check text-success"></i> 沙箱环境测试</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 路线图区域 -->
+            <section id="roadmap" class="section section-lg">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8 text-center">
+                            <h2>发展路线图</h2>
+                            <p class="lead">我们持续创新，为您提供更好的服务</p>
+                        </div>
+                    </div>
+                    <div class="row mt-5">
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <div class="timeline-item">
+                                    <div class="timeline-marker"></div>
+                                    <h5>2025 Q1</h5>
+                                    <p>基础支付功能上线，支持主流支付方式</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <div class="timeline-item">
+                                    <div class="timeline-marker"></div>
+                                    <h5>2025 Q2</h5>
+                                    <p>增加更多支付渠道，优化用户体验</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <div class="timeline-item">
+                                    <div class="timeline-marker"></div>
+                                    <h5>2025 Q3</h5>
+                                    <p>推出企业级解决方案，支持大额交易</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 联系我们区域 -->
+            <section id="contacts" class="section section-lg bg-light">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8 text-center">
+                            <h2>联系我们</h2>
+                            <p class="lead">有任何问题或需要技术支持，请随时联系我们</p>
+                        </div>
+                    </div>
+                    <div class="row mt-5">
+                        <div class="col-lg-8 mx-auto">
+                            <el-form :model="form" :rules="rules" ref="contactForm" label-width="100px">
+                                <el-form-item label="联系人" prop="name">
+                                    <el-input v-model="form.name" placeholder="请输入您的姓名"></el-input>
+                                </el-form-item>
+                                <el-form-item label="手机号" prop="mobile">
+                                    <el-input v-model="form.mobile" placeholder="请输入您的手机号"></el-input>
+                                </el-form-item>
+                                <el-form-item label="邮箱">
+                                    <el-input v-model="form.email" placeholder="请输入您的邮箱"></el-input>
+                                </el-form-item>
+                                <el-form-item label="行业">
+                                    <el-select v-model="form.hy" placeholder="请选择您的行业">
+                                        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                                    </el-select>
+                                </el-form-item>
+                                <el-form-item label="备注">
+                                    <el-input type="textarea" v-model="form.remark" placeholder="请描述您的需求"></el-input>
+                                </el-form-item>
+                                <el-form-item>
+                                    <el-button type="primary" @click="onSubmit('contactForm')" :disabled="disabled">提交</el-button>
+                                </el-form-item>
+                            </el-form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 页脚 -->
+        <footer class="section section-sm bg-dark text-white">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p>&copy; 2025 NextsPay. All rights reserved.</p>
+                    </div>
+                    <div class="col-md-6 text-right">
+                        <p>专业的支付解决方案提供商</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <!-- 二维码弹窗 -->
+        <el-dialog :title="codeTitle" :visible.sync="dialogVisibleCode" width="300px" center>
+            <div class="text-center">
+                <div class="showHomePageCode"></div>
+            </div>
+        </el-dialog>
+    </div>
+
+    <!-- 加载动画 -->
+    <div v-show="!showPage" class="preloader">
+        <div class="preloader-body">
+            <div class="cssload-container">
+                <div class="cssload-speeding-wheel"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Files -->
+    <script src="js/jquery.js"></script>
+    <script src="js/vue.js"></script>
+    <script src="js/element.js"></script>
+    <script src="js/axios.min.js"></script>
+    <script src="js/jquery.qrcode.min.js"></script>
+    <script src="js/util.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

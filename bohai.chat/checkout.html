@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>收银台 - NextsPay</title>
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/element.css">
+    <link rel="stylesheet" href="css/fonts.css">
+    <link rel="stylesheet" href="css/style-5.css">
+    
+    <style>
+        .checkout-container {
+            min-height: 100vh;
+            background: #f8f9fa;
+            padding: 40px 0;
+        }
+        .checkout-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .order-summary {
+            background: #f8f9fa;
+            padding: 20px;
+        }
+        .payment-method {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .payment-method:hover {
+            border-color: #007bff;
+            background: #f8f9ff;
+        }
+        .payment-method.selected {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+        .payment-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 15px;
+        }
+        .order-item {
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+        }
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        .total-section {
+            background: #007bff;
+            color: white;
+            padding: 20px;
+            margin: 20px -20px -20px -20px;
+        }
+        .qr-code-container {
+            text-align: center;
+            padding: 20px;
+        }
+        .countdown {
+            font-size: 18px;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- 导航栏 -->
+        <header class="rd-navbar-wrap">
+            <nav class="rd-navbar rd-navbar-classic" data-layout="rd-navbar-fixed">
+                <div class="rd-navbar-main-outer">
+                    <div class="rd-navbar-main">
+                        <div class="rd-navbar-panel">
+                            <div class="rd-navbar-brand">
+                                <a class="brand" href="index.html">
+                                    <img class="brand-logo-dark" src="images/logo-default-1-324x88.png" alt="NextsPay" width="162" height="44"/>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <div class="checkout-container">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="checkout-card">
+                            <!-- 订单信息 -->
+                            <div class="p-4">
+                                <h3 class="mb-4">
+                                    <i class="fa fa-credit-card"></i> 收银台
+                                </h3>
+                                
+                                <!-- 订单商品列表 -->
+                                <div class="order-summary mb-4">
+                                    <h5 class="mb-3">订单详情</h5>
+                                    <div class="order-item" v-for="item in orderItems" :key="item.id">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-2">
+                                                <img :src="item.image" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6 class="mb-1">{{ item.name }}</h6>
+                                                <small class="text-muted">{{ item.description }}</small>
+                                            </div>
+                                            <div class="col-md-2 text-center">
+                                                <span class="badge badge-secondary">x{{ item.quantity }}</span>
+                                            </div>
+                                            <div class="col-md-2 text-right">
+                                                <strong>¥{{ (item.price * item.quantity).toFixed(2) }}</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 支付方式选择 -->
+                                <div class="mb-4">
+                                    <h5 class="mb-3">选择支付方式</h5>
+                                    <div class="row">
+                                        <div class="col-md-6" v-for="method in paymentMethods" :key="method.id">
+                                            <div class="payment-method" 
+                                                 :class="{ selected: selectedPayment === method.id }"
+                                                 @click="selectPayment(method.id)">
+                                                <div class="d-flex align-items-center">
+                                                    <img :src="method.icon" class="payment-icon" :alt="method.name">
+                                                    <div>
+                                                        <h6 class="mb-1">{{ method.name }}</h6>
+                                                        <small class="text-muted">{{ method.description }}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 订单总计 -->
+                                <div class="total-section">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h4 class="mb-0">订单总额</h4>
+                                            <small>包含运费和税费</small>
+                                        </div>
+                                        <div class="col-md-6 text-right">
+                                            <h2 class="mb-0">¥{{ totalAmount.toFixed(2) }}</h2>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 支付按钮 -->
+                                <div class="text-center mt-4">
+                                    <el-button type="primary" size="large" @click="createOrder" :loading="creatingOrder">
+                                        <i class="fa fa-credit-card"></i>
+                                        立即支付 ¥{{ totalAmount.toFixed(2) }}
+                                    </el-button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 支付二维码弹窗 -->
+        <el-dialog :title="paymentTitle" :visible.sync="showPaymentQR" width="400px" center>
+            <div class="qr-code-container">
+                <div v-if="paymentStatus === 'pending'">
+                    <div class="mb-3">
+                        <div class="countdown">支付倒计时: {{ countdown }}秒</div>
+                    </div>
+                    <div id="paymentQRCode"></div>
+                    <p class="mt-3 text-muted">请使用{{ selectedPaymentName }}扫描二维码完成支付</p>
+                    <el-button @click="checkPaymentStatus" :loading="checkingStatus">检查支付状态</el-button>
+                </div>
+                <div v-else-if="paymentStatus === 'success'">
+                    <i class="fa fa-check-circle fa-5x text-success mb-3"></i>
+                    <h4 class="text-success">支付成功！</h4>
+                    <p>订单号: {{ orderNo }}</p>
+                    <el-button type="primary" @click="goToSuccess">查看订单</el-button>
+                </div>
+                <div v-else-if="paymentStatus === 'failed'">
+                    <i class="fa fa-times-circle fa-5x text-danger mb-3"></i>
+                    <h4 class="text-danger">支付失败</h4>
+                    <p>{{ errorMessage }}</p>
+                    <el-button @click="retryPayment">重新支付</el-button>
+                </div>
+            </div>
+        </el-dialog>
+    </div>
+
+    <!-- JavaScript Files -->
+    <script src="js/jquery.js"></script>
+    <script src="js/vue.js"></script>
+    <script src="js/element.js"></script>
+    <script src="js/axios.min.js"></script>
+    <script src="js/jquery.qrcode.min.js"></script>
+    <script src="js/util.js"></script>
+    <script src="js/api.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    orderItems: [],
+                    selectedPayment: '',
+                    creatingOrder: false,
+                    showPaymentQR: false,
+                    paymentStatus: 'pending', // pending, success, failed
+                    orderNo: '',
+                    countdown: 900, // 15分钟
+                    countdownTimer: null,
+                    checkingStatus: false,
+                    errorMessage: '',
+                    paymentTitle: '',
+                    selectedPaymentName: '',
+                    paymentMethods: [
+                        {
+                            id: 'wechat',
+                            name: '微信支付',
+                            description: '安全便捷的移动支付',
+                            icon: 'images/pay/icon_pay_weixin.png',
+                            enabled: true
+                        },
+                        {
+                            id: 'alipay',
+                            name: '支付宝',
+                            description: '快速安全的在线支付',
+                            icon: 'images/pay/icon_pay_zhifubao.png',
+                            enabled: true
+                        },
+                        {
+                            id: 'unionpay',
+                            name: '银联支付',
+                            description: '银行卡直接支付',
+                            icon: 'images/pay/unionpay.png',
+                            enabled: true
+                        },
+                        {
+                            id: 'stripe',
+                            name: 'Stripe',
+                            description: '国际信用卡支付',
+                            icon: 'images/pay/stripe.png',
+                            enabled: true
+                        }
+                    ]
+                }
+            },
+            computed: {
+                totalAmount() {
+                    return this.orderItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+                }
+            },
+            mounted() {
+                this.loadOrderItems();
+            },
+            beforeDestroy() {
+                if (this.countdownTimer) {
+                    clearInterval(this.countdownTimer);
+                }
+            },
+            methods: {
+                loadOrderItems() {
+                    // 从URL参数获取购物车数据
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const cartData = urlParams.get('cart');
+                    
+                    if (cartData) {
+                        try {
+                            this.orderItems = JSON.parse(decodeURIComponent(cartData));
+                        } catch (error) {
+                            this.$message.error('订单数据错误');
+                            this.goBack();
+                        }
+                    } else {
+                        this.$message.error('没有订单数据');
+                        this.goBack();
+                    }
+                },
+                selectPayment(paymentId) {
+                    this.selectedPayment = paymentId;
+                    const method = this.paymentMethods.find(m => m.id === paymentId);
+                    this.selectedPaymentName = method ? method.name : '';
+                },
+                async createOrder() {
+                    if (!this.selectedPayment) {
+                        this.$message.warning('请选择支付方式');
+                        return;
+                    }
+                    
+                    this.creatingOrder = true;
+                    
+                    try {
+                        const orderData = {
+                            items: this.orderItems,
+                            total_amount: this.totalAmount,
+                            payment_type: this.selectedPayment,
+                            subject: '商品购买',
+                            body: `购买${this.orderItems.length}件商品`
+                        };
+                        
+                        const response = await api.createPaymentOrder(orderData);
+                        
+                        if (response.code === 200) {
+                            this.orderNo = response.result.order_no;
+                            this.paymentTitle = `${this.selectedPaymentName} - 订单${this.orderNo}`;
+                            this.showPaymentQR = true;
+                            this.startCountdown();
+                            this.generateQRCode(response.result.payment_url);
+                            this.startPaymentStatusCheck();
+                        } else {
+                            this.$message.error(response.msg);
+                        }
+                    } catch (error) {
+                        this.$message.error('创建订单失败');
+                        console.error(error);
+                    } finally {
+                        this.creatingOrder = false;
+                    }
+                },
+                generateQRCode(paymentUrl) {
+                    $('#paymentQRCode').empty();
+                    $('#paymentQRCode').qrcode({
+                        render: "canvas",
+                        width: 200,
+                        height: 200,
+                        text: paymentUrl
+                    });
+                },
+                startCountdown() {
+                    this.countdown = 900; // 15分钟
+                    this.countdownTimer = setInterval(() => {
+                        this.countdown--;
+                        if (this.countdown <= 0) {
+                            this.paymentStatus = 'failed';
+                            this.errorMessage = '支付超时';
+                            clearInterval(this.countdownTimer);
+                        }
+                    }, 1000);
+                },
+                startPaymentStatusCheck() {
+                    // 每5秒检查一次支付状态
+                    this.statusCheckTimer = setInterval(() => {
+                        this.checkPaymentStatus();
+                    }, 5000);
+                },
+                async checkPaymentStatus() {
+                    if (!this.orderNo) return;
+                    
+                    this.checkingStatus = true;
+                    
+                    try {
+                        const response = await api.queryPaymentOrder(this.orderNo);
+                        
+                        if (response.code === 200) {
+                            const order = response.result;
+                            
+                            if (order.status === 'success') {
+                                this.paymentStatus = 'success';
+                                clearInterval(this.countdownTimer);
+                                clearInterval(this.statusCheckTimer);
+                                this.clearCart();
+                            } else if (order.status === 'failed') {
+                                this.paymentStatus = 'failed';
+                                this.errorMessage = '支付失败';
+                                clearInterval(this.countdownTimer);
+                                clearInterval(this.statusCheckTimer);
+                            }
+                        }
+                    } catch (error) {
+                        console.error('检查支付状态失败:', error);
+                    } finally {
+                        this.checkingStatus = false;
+                    }
+                },
+                goToSuccess() {
+                    const params = new URLSearchParams({
+                        order_no: this.orderNo,
+                        amount: this.totalAmount.toFixed(2),
+                        payment_type: this.selectedPayment,
+                        pay_time: new Date().toLocaleString('zh-CN')
+                    });
+                    
+                    window.location.href = `success.html?${params.toString()}`;
+                },
+                retryPayment() {
+                    this.paymentStatus = 'pending';
+                    this.showPaymentQR = false;
+                    this.createOrder();
+                },
+                clearCart() {
+                    localStorage.removeItem('cart');
+                },
+                goBack() {
+                    window.location.href = 'products.html';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
